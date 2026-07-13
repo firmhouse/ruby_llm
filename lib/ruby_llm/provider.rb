@@ -209,9 +209,9 @@ module RubyLLM
       container_protocol.new(self).delete(id)
     end
 
-    def upload_container_file(container_id, file, filename: nil) # :nodoc:
+    def upload_container_file(container_id, file, filename: nil, content_type: nil) # :nodoc:
       ensure_containers_supported!
-      container_protocol.new(self).upload_file(container_id, file, filename:)
+      container_protocol.new(self).upload_file(container_id, file, filename:, content_type:)
     end
 
     def list_container_files(container_id) # :nodoc:

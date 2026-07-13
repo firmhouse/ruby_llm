@@ -19,8 +19,8 @@ module RubyLLM
       @metadata = attributes[:metadata] || {}
     end
 
-    def upload(file, filename: nil)
-      provider_instance.upload_container_file(id, file, filename:)
+    def upload(file, filename: nil, content_type: nil)
+      provider_instance.upload_container_file(id, file, filename:, content_type:)
     end
 
     def files
@@ -54,9 +54,9 @@ module RubyLLM
         @connection.delete("containers/#{id}").body
       end
 
-      def upload_file(container_id, file, filename: nil)
+      def upload_file(container_id, file, filename: nil, content_type: nil)
         attachment = file.is_a?(Attachment) && filename.nil? ? file : Attachment.new(file, filename:)
-        payload = { file: file_part(attachment) }
+        payload = { file: file_part(attachment, content_type:) }
         response = @connection.post("containers/#{container_id}/files", payload) do |request|
           request.headers.delete('Content-Type')
         end
@@ -102,10 +102,10 @@ module RubyLLM
         )
       end
 
-      def file_part(attachment)
+      def file_part(attachment, content_type: nil)
         Faraday::Multipart::FilePart.new(
           file_part_source(attachment),
-          attachment.mime_type,
+          content_type || attachment.mime_type,
           attachment.filename
         )
       end

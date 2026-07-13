@@ -72,4 +72,24 @@ RSpec.describe RubyLLM::Container::Protocol do
 
     expect(protocol.download_file('cntr_123', 'cfile_123')).to eq("template\n")
   end
+
+  it 'uses an explicit content type for uploaded container files' do
+    response = instance_double(Faraday::Response, body: {
+                                 'id' => 'cfile_123',
+                                 'container_id' => 'cntr_123',
+                                 'path' => '/mnt/data/dashboard.liquid',
+                                 'bytes' => 42
+                               })
+    allow(connection).to receive(:post).with('containers/cntr_123/files', anything).and_yield(
+      Struct.new(:headers).new({})
+    ).and_return(response)
+
+    file = StringIO.new('<div>Customer portal</div>')
+    protocol.upload_file('cntr_123', file, filename: 'dashboard.liquid', content_type: 'text/x-liquid')
+
+    expect(connection).to have_received(:post) do |_path, payload|
+      expect(payload.fetch(:file).content_type).to eq('text/x-liquid')
+      expect(payload.fetch(:file).original_filename).to eq('dashboard.liquid')
+    end
+  end
 end
