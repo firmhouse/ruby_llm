@@ -190,6 +190,40 @@ module RubyLLM
       !!file_protocol
     end
 
+    def containers? # :nodoc:
+      !!container_protocol
+    end
+
+    def create_container(**options) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).create(**options)
+    end
+
+    def find_container(id) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).find(id)
+    end
+
+    def delete_container(id) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).delete(id)
+    end
+
+    def upload_container_file(container_id, file, filename: nil) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).upload_file(container_id, file, filename:)
+    end
+
+    def list_container_files(container_id) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).list_files(container_id)
+    end
+
+    def download_container_file(container_id, file_id) # :nodoc:
+      ensure_containers_supported!
+      container_protocol.new(self).download_file(container_id, file_id)
+    end
+
     def list_models # :nodoc:
       default_protocol.new(self).list_models
     end
@@ -298,7 +332,7 @@ module RubyLLM
     end
 
     class << self
-      attr_reader :default_protocol, :file_protocol # :nodoc:
+      attr_reader :default_protocol, :file_protocol, :container_protocol # :nodoc:
       attr_writer :slug # :nodoc:
 
       # Returns the provider slug, a short lowercase string that
@@ -390,6 +424,12 @@ module RubyLLM
         @file_protocol = protocol_class
       end
 
+      # Declares the protocol class that handles hosted containers for the
+      # provider.
+      def containers(protocol_class)
+        @container_protocol = protocol_class
+      end
+
       def protocols # :nodoc:
         @protocols ||= {}
       end
@@ -470,6 +510,12 @@ module RubyLLM
       raise Error, "#{slug} doesn't support file uploads"
     end
 
+    def ensure_containers_supported!
+      return if container_protocol
+
+      raise Error, "#{slug} doesn't support hosted containers"
+    end
+
     def resolve_protocol(name, model, **request)
       explicit = name || configured_protocol
       explicit ? fetch_protocol(explicit) : protocol_for(model, **request)
@@ -493,6 +539,10 @@ module RubyLLM
 
     def file_protocol
       self.class.file_protocol
+    end
+
+    def container_protocol
+      self.class.container_protocol
     end
 
     def configured_protocol

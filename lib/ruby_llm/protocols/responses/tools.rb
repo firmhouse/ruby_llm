@@ -9,6 +9,8 @@ module RubyLLM
         module_function
 
         def tool_for(tool)
+          return tool.built_in_definition if tool.built_in?
+
           definition = {
             type: 'function',
             name: tool.name,

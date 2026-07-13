@@ -79,5 +79,15 @@ module RubyLLM
     def download(*args, **kwargs, &)
       UploadedFile.download(*args, **kwargs, context: self, &)
     end
+
+    # Creates a provider-hosted container using this context's configuration.
+    def create_container(*args, **kwargs, &)
+      Container.create(*args, **kwargs, context: self, &)
+    end
+
+    # Finds a provider-hosted container using this context's configuration.
+    def find_container(*args, **kwargs, &)
+      Container.find(*args, **kwargs, context: self, &)
+    end
   end
 end

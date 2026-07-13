@@ -63,7 +63,8 @@ RSpec.describe RubyLLM::Protocols::Responses::Chat do
 
     it 'uses flat function definitions' do
       tool = instance_double(RubyLLM::Tool, name: 'weather', description: 'Looks up weather',
-                                            parameters_schema: { 'type' => 'object' }, provider_options: {})
+                                            parameters_schema: { 'type' => 'object' }, provider_options: {},
+                                            built_in?: false)
 
       payload = render_payload([RubyLLM::Message.new(role: :user, content: 'hi')], tools: { weather: tool })
 
@@ -72,6 +73,20 @@ RSpec.describe RubyLLM::Protocols::Responses::Chat do
                                       name: 'weather',
                                       description: 'Looks up weather',
                                       parameters: { 'type' => 'object' }
+                                    }])
+    end
+
+    it 'renders provider-hosted tools without function metadata' do
+      tool = RubyLLM::Tool::HostedShell.new(container_id: 'cntr_123')
+
+      payload = render_payload([RubyLLM::Message.new(role: :user, content: 'hi')], tools: { shell: tool })
+
+      expect(payload[:tools]).to eq([{
+                                      type: 'shell',
+                                      environment: {
+                                        type: 'container_reference',
+                                        container_id: 'cntr_123'
+                                      }
                                     }])
     end
 

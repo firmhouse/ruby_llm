@@ -204,4 +204,25 @@ RSpec.describe RubyLLM::Tool do
       )
     end
   end
+
+  describe RubyLLM::Tool::HostedShell do
+    it 'uses an existing container when one is provided' do
+      tool = described_class.new(container_id: 'cntr_123')
+
+      expect(tool).to be_built_in
+      expect(tool.built_in_definition).to eq(
+        type: 'shell',
+        environment: { type: 'container_reference', container_id: 'cntr_123' }
+      )
+    end
+
+    it 'requests an automatic container by default' do
+      tool = described_class.new
+
+      expect(tool.built_in_definition).to eq(
+        type: 'shell',
+        environment: { type: 'container_auto' }
+      )
+    end
+  end
 end

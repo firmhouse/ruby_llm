@@ -7,6 +7,7 @@ module RubyLLM
       protocol :responses, Protocols::Responses, batches: Protocols::Responses::Batches
       protocol :chat_completions, Protocols::ChatCompletions, batches: Protocols::ChatCompletions::Batches
       files Protocols::OpenAI::Files
+      containers Protocols::OpenAI::Containers
 
       def api_base
         @config.openai_api_base || 'https://api.openai.com/v1'

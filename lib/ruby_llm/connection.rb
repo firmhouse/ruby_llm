@@ -54,6 +54,15 @@ module RubyLLM
       end
     end
 
+    def delete(url, &)
+      instrument_request(:delete, url) do
+        @connection.delete url do |req|
+          req.headers.merge! @provider.headers
+          yield req if block_given?
+        end
+      end
+    end
+
     # Keeps the config and Faraday internals out of pretty-printed output.
     def pretty_print_instance_variables
       super - %i[@config @connection]

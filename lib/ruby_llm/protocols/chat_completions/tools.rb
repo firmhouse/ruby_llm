@@ -28,6 +28,8 @@ module RubyLLM
         end
 
         def tool_for(tool)
+          raise Error, "#{tool.name} is a provider-hosted tool and requires the Responses API" if tool.built_in?
+
           parameters_schema = parameters_schema_for(tool)
 
           definition = {

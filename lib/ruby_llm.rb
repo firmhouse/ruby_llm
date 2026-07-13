@@ -206,6 +206,17 @@ module RubyLLM
       UploadedFile.download(...)
     end
 
+    # Creates a provider-hosted container. OpenAI containers can be mounted
+    # into Responses API built-in tools such as HostedShell.
+    def create_container(...)
+      Container.create(...)
+    end
+
+    # Finds an existing provider-hosted container.
+    def find_container(...)
+      Container.find(...)
+    end
+
     # Renders the ERB prompt template +name+ and returns the result as a
     # String. The name resolves to a <tt>.txt.erb</tt> file under
     # app/prompts. Keyword arguments become locals in the template.

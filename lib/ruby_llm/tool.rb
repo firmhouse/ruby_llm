@@ -180,6 +180,18 @@ module RubyLLM
       self.class.provider_options
     end
 
+    # Returns whether this tool is executed by the provider rather than by
+    # RubyLLM's local function-tool loop.
+    def built_in? # :nodoc:
+      false
+    end
+
+    # Returns the provider-native tool definition. Built-in tools override
+    # this and are rendered verbatim by protocols that support them.
+    def built_in_definition # :nodoc:
+      nil
+    end
+
     def parameters_schema # :nodoc:
       return @parameters_schema if defined?(@parameters_schema)
 
